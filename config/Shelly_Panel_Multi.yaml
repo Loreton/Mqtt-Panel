@@ -1,0 +1,71 @@
+        -   panelName: Shelly sample
+            topic: shellies/Shelly_Letto/relay/0
+            seperateSubscribeTopic: shellies/Shelly_Letto/relay/0
+            hasCustomIcon: true
+            showReceivedTimeStamp: true
+            showSentTimeStamp: true
+            isJSONPayload: false
+            panelId: panel_9
+            type: combo-box
+            mqttType: pubsub
+            panelWidth: '100'
+            retain: false
+            qos: 0
+            confirmBeforePublish: false
+            confirmationMessage: Are you sure?
+            panelMergeClass: 'merge-left   '
+            options:
+
+            -   $$hashKey: object:2428
+                icon: filter_vintage
+                iconColor: rgba(232, 235, 41, 0.44) # giallo
+                label: State
+                payload: state .toTG .toLN
+
+            -   icon: timer_off
+                iconColor: '#7997d9' # cyan
+                $$hashKey: object:152
+                label: Timers Disable
+                payload: Timers_Disable .toLN
+
+            -   icon: timer
+                iconColor: '#26da33' # green
+                $$hashKey: object:401
+                label: Timers Enable
+                payload: timers_enable .toLN
+
+            -   icon: hourglass_empty
+                iconColor: '#9E9E9E' # grey
+                $$hashKey: object:790
+                label: Pulsetime off
+                payload: Pulsetime 0 .toLN
+
+            -   icon: hourglass_empty
+                iconColor: '#26da33' # green
+                $$hashKey: object:901
+                label: Pulsetime 15 sec.
+                payload: Pulsetime 15 .toLN
+
+            -   icon: cloud
+                iconColor: '#26da33' # green
+                $$hashKey: object:902
+                label: Mqtt Enable
+                payload: Mqtt_Enable .toLN
+
+            -   icon: cloud_done
+                iconColor: '#9E9E9E'
+                $$hashKey: object:903
+                label: Mqtt Disable
+                payload: Mqtt_Disable .toLN
+
+            # -   icon: cloud_download
+            #     iconColor: '#9E9E9E'
+            #     $$hashKey: object:904
+            #     label: Cloud Disable
+            #     payload: Cloud_Disable .toLN
+
+            # -   icon: cloud_upload
+            #     iconColor: '#9E9E9E'
+            #     $$hashKey: object:905
+            #     label: Cloud Enable
+            #     payload: Cloud_Enable .toLN

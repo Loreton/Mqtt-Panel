@@ -1,0 +1,26 @@
+dataVersion: 54
+appTheme: dark
+runInBackground: true
+wakeLock: false
+displayOrientation: portrait
+connections:
+  - connectionName: LnMqtt
+    host: lnmqtt.duckdns.org
+    port: 1883
+    username: Loreto
+    password: LoretoMqtt
+    connectionType: tcp
+    autoConnect: true
+    clientId: mHOFtMS7VQ
+    connectionTimeout: 30
+    keepAlive: 60
+    defaultDashboard: dashboard_10
+    connectionId: connection_0
+    dashboards:
+      - dashboardName: Pompe
+        dashboardId: dashboard_8
+        dashboardIcon: ev_station
+        dashboardColor: '#4CAF50'
+        dashboardPrefixTopic: ''
+        panels:
+         - commands: _!include PressControl.yaml
