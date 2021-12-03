@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 #
 # updated by ...: Loreto Notarantonio
-# Date .........: 26-11-2021 08.57.18
+# Date .........: 02-12-2021 17.02.55
 #
 import  sys; sys.dont_write_bytecode = True
 import  os, socket
 from    pathlib import Path
 this=sys.modules[__name__]
-__version__="Mqtt-Client V2021-11-26_085718"
+__version__="Mqtt-Client V2021-12-02_170255"
 
 #todo: calcolare sunrise per shellies
 #todo: modificare pulsetime: 0 su tasmota telegram message
@@ -20,8 +20,8 @@ from    Source.main.setPathsLN import setPaths; setPaths(sub_dirs=[
                                                         'Source/main',
                                                         # 'Source/lnLib', # used only for building Source/LnLib.zip...
                                                         'Source/lnLib.zip',
-                                                        'Source/mqtt',
-                                                        'Source/mqtt/mqtt_msg',
+                                                        # 'Source/mqtt',
+                                                        # 'Source/mqtt/mqtt_msg',
                                                         # 'Source/telegram',
                                                         # 'Source/telegram/API',
                                                         # '/home/pi/GIT-REPO/Python/LnPyLib/Configuration-LN',
@@ -30,24 +30,23 @@ from    Source.main.setPathsLN import setPaths; setPaths(sub_dirs=[
                                                         fDEBUG=False)
 
 
-from  LnLib.fernetLN     import FernetLN
 from  LnLib.loggerLN     import getLnLogger, getNullLogger
-from  LnLib.YamlLoaderLN import LoadConfigurationFile
-from  LnLib.toYaml       import readYamlFile, writeYamlFile, print_dict
+# from  LnLib.YamlLoaderLN import LoadConfigurationFile
+# from  LnLib.toYaml       import readYamlFile, writeYamlFile, print_dict
 
 from  parseInput         import parseInput
 
-
+from Configuration_Interface import ConfigurationInterface_Class
 
 
 
 
 if __name__ == '__main__':
-    print('starting....')
     _this_filepath=Path(sys.argv[0]).resolve()
     script_path=_this_filepath.parent # ... then up one level
     os.chdir(script_path) #  cambiamo dir per avere riferimenti relativi ai file
-    log_dir='/tmp/mqtt_client'
+    appl_name='mqtt_panel'
+    log_dir=f'/tmp/{appl_name}'
 
     """ parsing input --------------- """
     args, log, dbg=parseInput(version=__version__)
@@ -57,16 +56,16 @@ if __name__ == '__main__':
         prj_name=script_path.parent.stem
 
     os.environ['script_path']=str(script_path) # potrebbe essere usata nel config_file
-    os.environ['TG_GROUP']=args.tggroup_name # usata nel config_file
+    # os.environ['TG_GROUP']=args.tggroup_name # usata nel config_file
     os.environ['LOG_DIR']=str(log_dir) # usata nel config_file
 
 
 
     """ logger start ----------- """
-    logger=getLnLogger(logger_config_file=f'conf/logger_config.yaml', #deve lavorare con il relative_path
+    logger=getLnLogger(logger_config_file=f'config/logger_config.yaml', #deve lavorare con il relative_path
                 log_dir=log_dir,
                 # log_filename=f'/tmp/{args.action}/{args.action}.log',
-                logger_name='mqtt_client',
+                logger_name=appl_name,
                 console_level=log.console,
                 program_version=__version__,
                 )
@@ -82,24 +81,29 @@ if __name__ == '__main__':
     """ logger end ------------- """
 
 
-
-
+    host_list=list(aliveHosts.keys())
+    # -----------------------------------
+    # - Connecting to mariaDB database
+    # -----------------------------------
     kwargs={
+        'db_user': os.getenv('MARIADB_USER'),
+        'db_password': os.getenv('MARIADB_PASSWORD'),
+        'db_host': os.getenv('MARIADB_HOST'),
+        'hostname': socket.gethostname(),
         'logger': logger,
-        'status_logger': status_logger,
         'pass_phrase': args.pass_phrase,
         'configuration_file': 'conf/mqtt_config.yaml',
-        'systemd': args.systemd, # under systemd control
     }
 
+    ###########################################
+    #
+    ###########################################
+    # create object class
+    myConfig=ConfigurationInterface_Class(appl_name=appl_name,
+                                                pass_phrase=kwargs['pass_phrase'],
+                                                configuration_file=args.file,
+                                                logger=logger)
 
-    # if args.action=='mqtt':
-    logger.info('starting Mqtt_Client')
-    import  Mqtt_class as MqttClient
-    MqttClient.Main(appl_name='mqtt_client', **kwargs)
-
-    # else:
-    #     print('exiting.... NO valid action:', args.action)
 
     logger.debug('exiting....')
     sys.exit(0)

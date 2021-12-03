@@ -1,0 +1,67 @@
+version: 1
+
+formatters:
+    f_coloredlogs:
+        class: coloredlogs.ColoredFormatter
+        datefmt: "%H:%M:%S"
+        format: "%(asctime)s [%(funcName)s:%(lineno)4s]: %(levelname)-8s %(message)s"
+
+    f_colorlog: # https://github.com/borntyping/python-colorlog
+                # black, red, green, yellow, blue, purple, cyan and white
+                # log_color: Return the color associated with the records level.
+                # log_colors={
+                #     'DEBUG':    'cyan',
+                #     'INFO':     'green',
+                #     'WARNING':  'yellow',
+                #     'ERROR':    'red',
+                #     'CRITICAL': 'red,bg_white',
+                # },
+        style: '%'
+        class: colorlog.ColoredFormatter
+        # format: "%(green)s%(asctime)s %(purple)s[%(funcName)s:%(lineno)4s]: %(log_color)s%(levelname)-8s %(message)s"
+        format: "%(green)s%(asctime)s %(log_color)s%(levelname)-4s %(purple)s[%(funcName)s:%(lineno)4s]: %(log_color)s%(message)s"
+        datefmt: "%m-%d %H:%M:%S"
+
+    f_console:
+        format: "[%(funcName)s:%(lineno)4s]: %(levelname)-8s %(message)s"
+
+    f_file:
+        # format: "%(asctime)s | %(levelname)-4s | %(funcName)s:%(lineno)4s: %(message)s"
+        format: "%(asctime)s %(levelname)-4s [%(funcName)s:%(lineno)4s]:  %(message)s"
+
+handlers:
+    console:
+        class: logging.StreamHandler
+        level: CRITICAL  # --log-console as cli parameter to set levle.DEBUG
+        # formatter: f_console
+        formatter: f_colorlog
+
+    size_rotating:
+        class: logging.handlers.RotatingFileHandler
+        level: WARNING
+        formatter: f_file
+        filename: /tmp/test_log.log # wll be overridden
+        maxBytes: 3000000 # 3MB
+        backupCount: 10
+        encoding: utf8
+
+    # warning:
+    #     class: logging.handlers.RotatingFileHandler
+    #     level: WARNING
+    #     formatter: f_file
+    #     filename: /tmp/test_log.log # wll be overridden
+    #     maxBytes: 3000000 # 3MB
+    #     backupCount: 10
+    #     encoding: utf8
+
+loggers:
+    mqtt_panel:
+        handlers: [size_rotating, console]
+
+    status:
+        handlers: [size_rotating]
+root:
+    handlers: [console, size_rotating]
+    level: DEBUG # questo forza il livello per tutti quindi lo metto al massimo
+    propogate: yes
+
