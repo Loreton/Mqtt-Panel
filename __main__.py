@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 #
 # updated by ...: Loreto Notarantonio
-# Date .........: 02-12-2021 17.02.55
+# Date .........: 23-12-2021 13.07.32
 #
 import  sys; sys.dont_write_bytecode = True
 import  os, socket
 from    pathlib import Path
 this=sys.modules[__name__]
-__version__="Mqtt-Client V2021-12-02_170255"
+__version__="Mqtt-Panel V2021-12-23_130732"
 
 #todo: calcolare sunrise per shellies
 #todo: modificare pulsetime: 0 su tasmota telegram message
@@ -30,7 +30,7 @@ from    Source.main.setPathsLN import setPaths; setPaths(sub_dirs=[
                                                         fDEBUG=False)
 
 
-from  LnLib.loggerLN     import getLnLogger, getNullLogger
+# from  LnLib.loggerLN     import getLnLogger, getNullLogger
 # from  LnLib.YamlLoaderLN import LoadConfigurationFile
 # from  LnLib.toYaml       import readYamlFile, writeYamlFile, print_dict
 
@@ -39,9 +39,35 @@ from  parseInput         import parseInput
 from Configuration_Interface import ConfigurationInterface_Class
 
 
+##########################################################################
+# https://coloredlogs.readthedocs.io/en/latest/readme.html#installation
+# https://coloredlogs.readthedocs.io/en/latest/api.html#changing-the-colors-styles
+##########################################################################
+def getColoredLogger(logging_file=None):
+    import logging, coloredlogs
+
+
+    def add_StreamingHandler():
+        # coloredlogs.DEFAULT_LOG_FORMAT = '%(asctime)s %(hostname)s %(name)s[%(process)d] %(levelname)s %(message)s'
+        coloredlogs.DEFAULT_LOG_FORMAT = '[%(name)s.%(funcName)-30s:%(lineno)4s %(process)d]: %(levelname)-8s %(message)s'
+        # coloredlogs.DEFAULT_LOG_FORMAT = '[%(funcName)-30s:%(lineno)4s %(process)d]: %(levelname)-8s %(message)s'
+        coloredlogs.install(level='DEBUG') # set also log level
+
+
+    logger = logging.getLogger(__name__)
+    # logger.setLevel('WARNING') # ROOT level default - decide il livello massimo
+
+    add_StreamingHandler()
+    # add_FileHandler(logging_file=logging_file, level=logging.DEBUG)
+    logger.setLevel('DEBUG') # ROOT level - decide il livello massimo
+    return logger
+
+
 
 
 if __name__ == '__main__':
+    logger=getColoredLogger()
+
     _this_filepath=Path(sys.argv[0]).resolve()
     script_path=_this_filepath.parent # ... then up one level
     os.chdir(script_path) #  cambiamo dir per avere riferimenti relativi ai file
@@ -61,48 +87,32 @@ if __name__ == '__main__':
 
 
 
-    """ logger start ----------- """
-    logger=getLnLogger(logger_config_file=f'config/logger_config.yaml', #deve lavorare con il relative_path
-                log_dir=log_dir,
-                # log_filename=f'/tmp/{args.action}/{args.action}.log',
-                logger_name=appl_name,
-                console_level=log.console,
-                program_version=__version__,
-                )
+    # """ logger start ----------- """
+    # logger=getLnLogger(logger_config_file=f'config/logger_config.yaml', #deve lavorare con il relative_path
+    #             log_dir=log_dir,
+    #             # log_filename=f'/tmp/{args.action}/{args.action}.log',
+    #             logger_name=appl_name,
+    #             console_level=log.console,
+    #             program_version=__version__,
+    #             )
 
-    """ status_logger ----------- """
-    status_logger=getNullLogger()
-    logger.include_modules(log.include)
-    logger.exclude_modules(log.exclude)
-    logger.exclude_modules(['decorator'])
-    logger.info('application arguments: %s', vars(args))
-    logger.debug('logging arguments: %s', log)
-    logger.debug('debugging arguments: %s', vars(dbg))
-    """ logger end ------------- """
+    # """ status_logger ----------- """
+    # status_logger=getNullLogger()
+    # logger.include_modules(log.include)
+    # logger.exclude_modules(log.exclude)
+    # logger.exclude_modules(['decorator'])
+    # logger.info('application arguments: %s', vars(args))
+    # logger.debug('logging arguments: %s', log)
+    # logger.debug('debugging arguments: %s', vars(dbg))
+    # """ logger end ------------- """
 
 
-    host_list=list(aliveHosts.keys())
-    # -----------------------------------
-    # - Connecting to mariaDB database
-    # -----------------------------------
-    kwargs={
-        'db_user': os.getenv('MARIADB_USER'),
-        'db_password': os.getenv('MARIADB_PASSWORD'),
-        'db_host': os.getenv('MARIADB_HOST'),
-        'hostname': socket.gethostname(),
-        'logger': logger,
-        'pass_phrase': args.pass_phrase,
-        'configuration_file': 'conf/mqtt_config.yaml',
-    }
 
     ###########################################
     #
     ###########################################
     # create object class
-    myConfig=ConfigurationInterface_Class(appl_name=appl_name,
-                                                pass_phrase=kwargs['pass_phrase'],
-                                                configuration_file=args.file,
-                                                logger=logger)
+    myConfig=ConfigurationInterface_Class(configuration_file=args.file, logger=logger)
 
 
     logger.debug('exiting....')
